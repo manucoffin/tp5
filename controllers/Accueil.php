@@ -3,23 +3,22 @@
 class AccueilController extends Controller{
 
 	public function index(){
-		/** @todo Lister sur l'accueil les 10 derniers articles CHECK */
-        $articles = ArticleModel::getLimit(10,0);
+
+        $limit = 10;
+        if(isset($_GET['page']))
+        {
+            $articles = ArticleModel::getLimit($limit, $_GET['page']*$limit);
+        }
+        else
+        {
+            // if the get variable is not set we want to get the first page
+            $articles = ArticleModel::getLimit($limit, 0);
+        }
+        $allArticles = ArticleModel::getAll();
+        
 		$this->set(array('articles'=>$articles));
+        $this->set(array('allArticles'=>$allArticles));
+        $this->set(array('limit'=>$limit));
 		$this->render('index');
 	}
-    
-    public function postprocess(){
-        if(count($_POST))
-        {
-            if(isset($_POST['register-form']))
-            {
-                echo "register";
-            }
-            else if(isset($_POST['signin-form']))
-            {
-                echo "connexion";
-            }
-        }
-    }
 }

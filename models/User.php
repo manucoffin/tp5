@@ -56,7 +56,7 @@ class UserModel extends Model{
 		//on supprime les commentaires
 		CommentaireModel::deleteByUser($this->id);
 		//on récuère ses articles
-		$articles = ArticleModel::getAll($this->id);
+		$articles = ArticleModel::getAllArticlesOnly($this->id);
 		foreach($articles as $article){
 			//pour chaque article, on supprime les commentaire
 			//puis les articles
@@ -75,6 +75,46 @@ class UserModel extends Model{
             $this->create();
         }
     }
+    
+    public function selectByName($name){
+        $req = $this->bdd->prepare('SELECT * FROM user WHERE name = :name');
+        $req->bindValue('name', $name, PDO::PARAM_INT);
+        $req->execute();
+        return $req->fetch();
+    }
+    
+    public function selectByEmail($mail){
+        $req = $this->bdd->prepare('SELECT * FROM user WHERE email = :mail');
+        $req->bindValue('mail', $mail, PDO::PARAM_INT);
+        $req->execute();
+        return $req->fetch();
+    }
+    
+    public function getArticles($id){
+        $req = $this->bdd->prepare('SELECT * FROM article WHERE id_user = :id');
+        $req->bindValue('id', $id, PDO::PARAM_INT);
+        $req->execute();
+        
+        $articles = array();
+        while($row = $req->fetch()){
+            $article = new ArticleModel($row['id']);
+            $articles[] = $article;
+        }
+        return $articles;
+    }
+    
+    public function getComments($id){
+        $req = $this->bdd->prepare('SELECT * FROM commentaire WHERE id_user = :id');
+        $req->bindValue('id', $id, PDO::PARAM_INT);
+        $req->execute();
+        
+        $comments = array();
+        while($row = $req->fetch()){
+            $comment = new ArticleModel($row['id']);
+            $comments[] = $comment;
+        }
+        return $comments;
+    }
 
     public static function getAll($actif=null){
 		$model = self::getInstance();
@@ -87,8 +127,37 @@ class UserModel extends Model{
         $users = array();
         while($row = $req->fetch()){
             $user = new UserModel($row['id']);
+            $articles = $user->getArticles($user->id);
+            $comments = $user->getComments($user->id);
+            $user = (array)$user;
+            $user['articles'] = $articles;
+            $user['comments'] = $comments;
+            
             $users[] = $user;
         }
         return $users;
     }
+    
+    public static function getLimit($nb, $offset = null){
+        $model = self::getInstance();
+        
+        $req = $model->bdd->prepare('SELECT id FROM user ORDER BY id DESC LIMIT :nb OFFSET :offset');
+        $req->bindValue('nb', $nb, PDO::PARAM_INT);
+        $req->bindValue('offset', $offset, PDO::PARAM_INT);
+        $req->execute();
+        $users = array();
+        while($row = $req->fetch()){
+            $user = new UserModel($row['id']);
+            $articles = $user->getArticles($user->id);
+            $comments = $user->getComments($user->id);
+            $user = (array)$user;
+            $user['articles'] = $articles;
+            $user['comments'] = $comments;
+            
+            $users[] = $user;
+        }
+        return $users;
+    }
+    
+    
 }

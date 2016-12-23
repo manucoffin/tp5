@@ -4,13 +4,13 @@
 define('WEBROOT', str_replace('index.php', '', $_SERVER['SCRIPT_NAME']));
 define('ROOT', str_replace('index.php', '', $_SERVER['SCRIPT_FILENAME']));
 
-if (in_array('mod_rewrite', apache_get_modules())) {
-    echo "Yes, Apache supports mod_rewrite.";
-}
-
-else {
-    echo "Apache is not loading mod_rewrite.";
-}
+//if (in_array('mod_rewrite', apache_get_modules())) {
+//    echo "Yes, Apache supports mod_rewrite.";
+//}
+//
+//else {
+//    echo "Apache is not loading mod_rewrite.";
+//}
 
 //on inclu le coeur de notre MVC
 require(ROOT . 'core/core.php');
@@ -44,10 +44,13 @@ $controller .= 'Controller';
 //on instancie notre controller, $controller est une variable nommée qui vaudra par exemple AccueilControlelr, ça reviendrai donc à faire new AccueilController
 $cont = new $controller();
 
-if(method_exists($controller, $action)){
+if(method_exists($controller, $action))
+{
 	//comme pour le controlleur, l'action est une variable nommée, ça équivaut à faire $cont->index(); par exemple
 	$cont->$action();
-}else{
+}
+else
+{
 	echo '404 - method not found';
 	die();
 }

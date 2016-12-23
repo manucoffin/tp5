@@ -1,4 +1,2 @@
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-</IfModule>
+RewriteEngine On
+RewriteRule ^([a-zA-Z0-9\-\_\/]*)$ index.php?p=$1 [L,QSA]

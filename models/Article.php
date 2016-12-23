@@ -59,21 +59,84 @@ Class ArticleModel extends Model{
 			$this->create();
 		}
 	}
+    
+    public function getAuthor($article_user_id){
+        $model = self::getInstance();
+        
+        $req = $model->bdd->prepare('SELECT user.id, user.name, user.actif, user.admin, user.email FROM user WHERE id = :id');
+        $req->bindValue('id', $article_user_id, PDO::PARAM_INT);
+        $req->execute();
+        
+        return $req->fetch();
+    }
 
+    
+    public static function getAllCommentedBy($userId){
+        $model = self::getInstance();
+        
+        $req = $model->bdd->prepare('SELECT article.id, article.titre, article.contenu, article.id_user, article.datetime FROM article INNER JOIN commentaire ON article.id=commentaire.id_article WHERE commentaire.id_user = :id GROUP BY article.id ORDER BY commentaire.datetime DESC');
+        $req->bindValue('id', $userId, PDO::PARAM_INT);
+        $req->execute();
+        
+        $articles = array();
+		while($row = $req->fetch()){
+			$article = new ArticleModel($row['id']);
+            // it can be useful to also have the author of the article
+            $author = $article->getAuthor($article->id_user);
+            
+            // transform article into array
+            $article = (array)$article;
+            // so that we can add it a property 'author'
+            $article['author'] = $author;
+            
+			$articles[] = $article;
+		}
+
+        return $articles;
+    }
+    
+    // Will return an array of associative arrays
 	public static function getAll($user_id = null){
 		$model = self::getInstance();
 		if(!is_null($user_id))
-			$req = $model->bdd->prepare('SELECT id FROM article WHERE id_user = '.$user_id.'ORDER BY datetime DESC');
+			$req = $model->bdd->prepare('SELECT id FROM article WHERE id_user = "'.$user_id.'" ORDER BY datetime DESC');
 		else
 			$req = $model->bdd->prepare('SELECT id FROM article ORDER BY datetime DESC');
+        
+		$req->execute();
+		$articles = array();
+		while($row = $req->fetch()){
+			$article = new ArticleModel($row['id']);
+            // it can be useful to also have the author of the article
+            $author = $article->getAuthor($article->id_user);
+            
+            // transform article into array
+            $article = (array)$article;
+            // so that we can add it a property 'author'
+            $article['author'] = $author;
+            
+			$articles[] = $article;
+		}
 
+        return $articles;
+	}
+    
+    // Will return an array of instance of Article
+    public static function getAllArticlesOnly($user_id = null){
+		$model = self::getInstance();
+		if(!is_null($user_id))
+			$req = $model->bdd->prepare('SELECT id FROM article WHERE id_user = "'.$user_id.'" ORDER BY datetime DESC');
+		else
+			$req = $model->bdd->prepare('SELECT id FROM article ORDER BY datetime DESC');
+        
 		$req->execute();
 		$articles = array();
 		while($row = $req->fetch()){
 			$article = new ArticleModel($row['id']);
 			$articles[] = $article;
 		}
-		return $articles;
+
+        return $articles;
 	}
     
     public static function getLimit($nb, $offset = null){
@@ -86,6 +149,13 @@ Class ArticleModel extends Model{
         $articles = array();
         while($row = $req->fetch()){
             $article = new ArticleModel($row['id']);
+            $author = $article->getAuthor($article->id_user);
+            
+            // transform article into array
+            $article = (array)$article;
+            // so that we can add it a property 'author'
+            $article['author'] = $author;
+            
             $articles[] = $article;
         }
         return $articles;

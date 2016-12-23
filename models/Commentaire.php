@@ -1,6 +1,6 @@
 <?php
 
-class CommentaireModel extends Model{
+class CommentaireModel extends Model implements SplSubject{
     // METTRE L4OBSERVER ICI
     public $id;
     public $titre;
@@ -66,17 +66,59 @@ class CommentaireModel extends Model{
             $this->create();
         }
     }
-
-    public static function getAll(){
-		$model = self::getInstance();
-        $req = $model->bdd->prepare('SELECT id FROM commentaire');
+    
+    public function getAuthor($comment_user_id){
+        $model = self::getInstance();
+        
+        $req = $model->bdd->prepare('SELECT user.id, user.name, user.actif, user.admin, user.email FROM user WHERE id = :id');
+        $req->bindValue('id', $comment_user_id, PDO::PARAM_INT);
         $req->execute();
-        $commentaires = array();
+        
+        return $req->fetch();
+    }
+
+    public static function getLimit($nb, $offset = null){
+        $model = self::getInstance();
+        
+        $req = $model->bdd->prepare('SELECT id FROM commentaire ORDER BY datetime DESC LIMIT :nb OFFSET :offset');
+        $req->bindValue('nb', $nb, PDO::PARAM_INT);
+        $req->bindValue('offset', $offset, PDO::PARAM_INT);
+        $req->execute();
+        $comments = array();
         while($row = $req->fetch()){
-            $commentaire = new CommentaireModel($row['id']);
-            $commentaires[] = $commentaire;
+            $comment = new CommentaireModel($row['id']);
+            $author = $comment->getAuthor($comment->id_user);
+            $comment = (array)$comment;
+            $comment['author'] = $author;
+            $comments[] = $comment;
         }
-        return $commentaires;
+        return $comments;
+    }
+    
+    public static function getAll($id_article = null){
+		$model = self::getInstance();
+        
+        if($id_article)
+        {
+            $req = $model->bdd->prepare('SELECT id FROM commentaire WHERE id_article = :id');
+            $req->bindValue('id', $id_article, PDO::PARAM_INT);
+        }
+        else
+        {
+            $req = $model->bdd->prepare('SELECT id FROM commentaire');
+        }
+
+        $req->execute();
+        $comments = array();
+        while($row = $req->fetch()){
+            $comment = new CommentaireModel($row['id']);
+            $author = $comment->getAuthor($comment->id_user);
+            $comment = (array)$comment;
+            $comment['author'] = $author;
+            $comments[] = $comment;
+        }
+        
+        return $comments;
     }
 
     public static function deleteByArticle($id_article){
@@ -93,6 +135,36 @@ class CommentaireModel extends Model{
         $req = $model->bdd->prepare('DELETE FROM commentaire WHERE id_user = :id');
         $req->bindValue('id', $id_user, PDO::PARAM_INT);
         $req->execute();
+    }
+    
+    // Ceci est le tableau qui va contenir tous les objets qui nous observent.
+    protected $observers = [];
+    // Dès que cet attribut changera on notifiera les classes observatrices.
+    protected $data;
+    
+    public function attach(SplObserver $observer){
+        $this->observers[] = $observer;
+    }
+    
+    public function detach(SplObserver $observer){
+        if (is_int($key = array_search($observer, $this->observers, true))){
+            unset($this->observers[$key]);
+        }
+    }
+    
+    public function notify(){
+        foreach ($this->observers as $observer){
+            $observer->update($this);
+        }
+    }
+    
+    public function getData(){
+        return $this->data;
+    }
+    
+    public function setData($data){
+        $this->data = $data;
+        $this->notify();
     }
 
 }
