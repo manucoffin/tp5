@@ -1,6 +1,5 @@
 <?php
 
-/** @todo sécuriser l'administration avec une connexion user */
 class AdminCommentaireController extends Controller{
 
 	public function index(){

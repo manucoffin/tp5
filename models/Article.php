@@ -6,6 +6,7 @@ Class ArticleModel extends Model{
 	public $contenu;
 	public $id_user;
 	public $datetime;
+    public $visits;
 
 	public function __construct($id=null) {
 		parent::__construct();
@@ -15,6 +16,7 @@ Class ArticleModel extends Model{
 			$this->titre = $data['titre'];
 			$this->contenu = $data['contenu'];
 			$this->id_user = $data['id_user'];
+            $this->visits = $data['visits'];
 			$tmpDate = DateTime::createFromFormat('Y-m-d H:i:s', $data['datetime']);
 			$tmpDate = $tmpDate !== false ? $tmpDate->format('d/m/Y à H:i:s') : $data['datetime'];
 			$this->datetime = $tmpDate;
@@ -68,6 +70,14 @@ Class ArticleModel extends Model{
         $req->execute();
         
         return $req->fetch();
+    }
+    
+    public function updateVisits($articleId){
+        $model = self::getInstance();
+        
+        $req = $model->bdd->prepare('UPDATE article SET visits=visits+1 WHERE id = :id');
+        $req->bindValue('id', $articleId, PDO::PARAM_INT);
+        $req->execute();
     }
 
     

@@ -1,7 +1,6 @@
 <?php
 
 class CommentaireController extends Controller{
-	/** @todo créer une méthode "postprocess" qui permet à un utilisateur conneté de poster un commentaire, si l'utilisateur n'est pas connecté, afficher le formulaire de connexion */
     
     public function postprocess(){
         if(isset($_POST['comment-form']))

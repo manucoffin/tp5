@@ -6,6 +6,8 @@
         <div class="card-stacked">
             <div class="card-content">
                 <h2><?php echo $user->name ?></h2>
+                <p>Ce profil a été vu <?php echo $user->visits+1 ?> fois.</p>
+                <br>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloremque assumenda autem est commodi alias sint, suscipit sapiente, a obcaecati ipsam amet quam saepe illo. Quae repudiandae porro quibusdam nulla deleniti.</p>
             </div>
             <div class="card-action">

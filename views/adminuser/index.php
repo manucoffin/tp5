@@ -3,11 +3,6 @@
     Télécharger la liste des membres
 </a>
 
-<?php if(isset($_SESSION['is_admin']) && $_SESSION['is_admin']){ ?>
-<a class="btn" href="<?php echo WEBROOT.'adminuser/createedit' ?>">Ajouter un utilisateur</a><br />
-<?php } ?>
-
-
 <ul class="pagination">
     <li class="waves-effect <?php if($_GET['page']<=0){echo 'disabled';} ?>"><a href="<?php echo ($_GET['page']<=0)?'#':WEBROOT.'adminuser/index?page='.($_GET['page']-1) ?>"><i class="material-icons">chevron_left</i></a></li>
     
@@ -22,6 +17,10 @@
 
     <li class="waves-effect"><a href="<?php echo WEBROOT.'adminuser/index?page='.($_GET['page']+1) ?>"><i class="material-icons">chevron_right</i></a></li>
 </ul>
+
+<?php if(isset($_SESSION['is_admin']) && $_SESSION['is_admin']){ ?>
+<a class="btn" href="<?php echo WEBROOT.'adminuser/createedit' ?>">Ajouter un utilisateur</a><br />
+<?php } ?>
 
 <table class="striped centered">
     <thead>

@@ -7,6 +7,7 @@ class UserModel extends Model{
     public $password;
     public $actif;
     public $admin;
+    public $visits;
 
     public function __construct($id=null) {
 		parent::__construct();
@@ -19,6 +20,7 @@ class UserModel extends Model{
             $this->password = $data['password'];
             $this->actif = $data['actif'];
             $this->admin = $data['admin'];
+            $this->visits = $data['visits'];
         }
     }
 
@@ -115,6 +117,14 @@ class UserModel extends Model{
         }
         return $comments;
     }
+    
+    public function updateVisits($userId){
+        $model = self::getInstance();
+        
+        $req = $model->bdd->prepare('UPDATE user SET visits=visits+1 WHERE id = :id');
+        $req->bindValue('id', $userId, PDO::PARAM_INT);
+        $req->execute();
+    }
 
     public static function getAll($actif=null){
 		$model = self::getInstance();
@@ -158,6 +168,7 @@ class UserModel extends Model{
         }
         return $users;
     }
+    
     
     
 }

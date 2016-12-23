@@ -37,9 +37,14 @@ class UserController extends Controller{
         
         $articleCommented = ArticleModel::getAllCommentedBy($userId);
         
+        // we update visits count here but the user data are already fetched.
+        // So we need to do +1 in the view to get the correct count
+        $user->updateVisits($userId);
+        
         $this->set(array('user'=>$user));
         $this->set(array('articles'=>$articles));
         $this->set(array('articleCommented'=>$articleCommented));
+        
         $this->render('detail');
     }
     

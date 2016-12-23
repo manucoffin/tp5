@@ -1,6 +1,5 @@
 <?php
 
-/** @todo sécuriser l'administration avec une connexion user */
 class AdminArticleController extends Controller{
 
 	public function index(){
@@ -20,6 +19,7 @@ class AdminArticleController extends Controller{
 		$this->set(array('articles'=>$articles));
         $this->set(array('allArticles'=>$allArticles));
         $this->set(array('limit'=>$limit));
+        
 		$this->render('index');
 	}
 

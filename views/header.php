@@ -13,6 +13,8 @@
         $(window).load(function(){ 
             $('ul.tabs').tabs();
             $('select').material_select();
+            
+            
         });
     </script>
     
@@ -30,13 +32,31 @@
             display: block;
             text-align: center;
         }
+        
+        .alert.success{
+            position: absolute;
+            top: 0;
+        }
+        
+        .close:hover{
+            cursor: pointer;
+        }
+        .close{
+            vertical-align: middle;
+        }
+        
     </style>
 </head>
 <body>
     <?php
     if(isset($_GET['register']) && $_GET['register'] == 'success'){ 
     ?>
-        <span class="alert light-green">Votre inscription a bien été prise en compte. Vous pouvez désormais <a href="<?php echo WEBROOT.'user/index' ?>">vous connecter</a></span>
+        <span class="alert success light-green">Votre inscription a bien été prise en compte. Vous pouvez désormais <a href="<?php echo WEBROOT.'user/index' ?>">vous connecter</a><i class="material-icons close" onclick="$(this).parent().css('display', 'none');">close</i></span>
+    <?php }
+        
+    if(isset($_GET['share']) && $_GET['share'] == 'success'){ 
+    ?>
+        <span class="alert success light-green">L'article a bien été partagé. <i class="material-icons close" onclick="$(this).parent().css('display', 'none');">close</i></span>
     <?php } ?>
     <nav>
         <ul class="container">
